@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Itallap - Alkoholmentes Koktélok - Édenkert</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(to bottom, #4facfe, #ffffff);
+      --text-color: #000;
+      --header-bg: rgba(255, 255, 255, 0.85);
+      --card-bg: rgba(255, 255, 255, 0.7);
+      --accent-color: #ff5fa2;
+    }
+    body.dark-mode {
+      --bg-gradient: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+      --text-color: #fff;
+      --header-bg: rgba(32, 58, 67, 0.85);
+      --card-bg: rgba(32, 58, 67, 0.7);
+    }
+    body.dark-mode .drink-price {
+      color: #ffc8e2;
+    }
+    body.dark-mode .drink-ingredients {
+      color: #e0f7ff;
+    }
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-color);
+      scroll-behavior: smooth;
+      transition: background 0.5s, color 0.5s;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: url('https://i.imgur.com/xP5k4lK.png');
+      background-size: contain;
+      background-repeat: repeat;
+      opacity: 0.1;
+      pointer-events: none;
+      z-index: -1;
+      animation: floatBackground 60s linear infinite;
+    }
+    @keyframes floatBackground {
+      from { background-position: 0 0; }
+      to { background-position: 1000px 1000px; }
+    }
+    header {
+      background-color: var(--header-bg);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-color);
+      animation: slideIn 1s ease-in-out;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(-100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .header-center {
+      flex: 1;
+      text-align: right;
+	   margin-right: 10px;
+    }
+    .menu {
+      position: relative;
+      display: inline-block;
+      user-select: none;
+    }
+    .menu-button {
+      cursor: pointer;
+      font-size: 1.5rem;
+      border: none;
+      background: none;
+      transition: transform 0.3s, color 0.3s;
+      color: #333; /* világos módban sötét */
+    }
+    body.dark-mode .menu-button {
+      color: #fff; /* sötét módban fehér */
+    }
+    .menu-button:hover {
+      transform: rotate(90deg);
+    }
+    /* Lenyíló menü módosított dizájn */
+    .dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 16px;
+      box-shadow:
+        0 10px 20px rgba(255, 95, 162, 0.18),
+        0 4px 8px rgba(255, 95, 162, 0.1);
+      z-index: 999;
+      white-space: nowrap;
+      padding: 0.6rem 0;
+      backdrop-filter: saturate(180%) blur(15px);
+      border: 1.5px solid rgba(255, 95, 162, 0.35);
+      animation: dropdownFadeIn 0.3s ease forwards;
+      transform-origin: top right;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    @keyframes dropdownFadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .dropdown a {
+      display: block;
+      padding: 1rem 2rem;
+      text-decoration: none;
+      color: #b31257;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.03em;
+      transition: background 0.3s, color 0.3s;
+      border-radius: 12px;
+      margin: 0 0.7rem;
+      user-select: none;
+    }
+    .dropdown a:hover {
+      background-color:  #ff5fa2;
+      color: #7a0e3b;
+      box-shadow: 0 4px 10px rgba(250, 0, 128, 0.3);
+      transform: translateX(6px);
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    /* Menu nyitva */
+    .menu.open .dropdown {
+      display: block;
+    }
+    .toggle-theme {
+      padding: 0.6rem 1.5rem;
+      border: none;
+      background-color: #ff5fa2;
+      color: white;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(255, 95, 162, 0.4);
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      user-select: none;
+    }
+
+    .toggle-theme:hover {
+      background-color: #e14c8d;
+      box-shadow: 0 6px 15px rgba(225, 76, 141, 0.6);
+      transform: scale(1.1);
+    }
+
+    .toggle-theme:active {
+      transform: scale(0.95);
+      box-shadow: 0 3px 8px rgba(225, 76, 141, 0.4);
+    }
+    main {
+      padding: 3rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1, h2 {
+      color: var(--accent-color);
+      margin-bottom: 1rem;
+      animation: fadeInText 1s ease-in-out both;
+    }
+    @keyframes fadeInText {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .drink-category {
+      margin-bottom: 3rem;
+    }
+    .drink-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .drink-card {
+      background-color: var(--card-bg);
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transform: translateY(50px);
+      opacity: 0;
+      animation: floatUp 0.8s ease forwards;
+      animation-delay: calc(var(--i) * 0.1s);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .drink-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+    }
+    @keyframes floatUp {
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    .drink-name {
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-bottom: 0.25rem;
+      color: var(--accent-color);
+    }
+    .drink-price {
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 0.5rem;
+    }
+    .drink-ingredients {
+      font-size: 0.9rem;
+      color: #555;
+      line-height: 1.3;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-text">Édenkert: Az ízek paradicsoma</div>
+    <div class="header-center">
+      <button id="toggle-theme-btn" class="toggle-theme" aria-label="Téma váltása">🌙</button>
+    </div>
+    <div class="menu" id="menu">
+      <button class="menu-button" aria-label="Menü">☰</button>
+      <div class="dropdown">
+        <a href="index.html">Főoldal</a>
+        <a href="kapcsolat.html">Kapcsolat</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="drink-category">
+      <h1>Alkoholmentes trópusi koktélok</h1>
+      <div class="drink-list">
+        <article class="drink-card" style="--i:0;"><div class="drink-name">Mango Paradise</div><div class="drink-price">1200 Ft</div><div class="drink-ingredients">Mangó, ananászlé, kókuszkrém, lime, mentalevél</div></article>
+        <article class="drink-card" style="--i:1;"><div class="drink-name">Tropical Breeze</div><div class="drink-price">1300 Ft</div><div class="drink-ingredients">Narancslé, ananászlé, grenadin, kókuszvíz, lime</div></article>
+        <article class="drink-card" style="--i:2;"><div class="drink-name">Pineapple Sunset</div><div class="drink-price">1250 Ft</div><div class="drink-ingredients">Ananászlé, narancslé, lime, cukorszirup, mentalevél</div></article>
+        <article class="drink-card" style="--i:3;"><div class="drink-name">Coconut Lagoon</div><div class="drink-price">1350 Ft</div><div class="drink-ingredients">Kókuszkrém, ananászlé, lime, menta, szódavíz</div></article>
+        <article class="drink-card" style="--i:4;"><div class="drink-name">Papaya Dream</div><div class="drink-price">1400 Ft</div><div class="drink-ingredients">Papaya, narancslé, lime, méz, mentalevél</div></article>
+        <article class="drink-card" style="--i:5;"><div class="drink-name">Passion Fruit Bliss</div><div class="drink-price">1300 Ft</div><div class="drink-ingredients">Passiógyümölcs, narancslé, cukorszirup, lime</div></article>
+        <article class="drink-card" style="--i:6;"><div class="drink-name">Kiwi Cooler</div><div class="drink-price">1200 Ft</div><div class="drink-ingredients">Kivi, lime, cukorszirup, szódavíz, mentalevél</div></article>
+        <article class="drink-card" style="--i:7;"><div class="drink-name">Banana Island</div><div class="drink-price">1250 Ft</div><div class="drink-ingredients">Banán, narancslé, kókuszvíz, lime</div></article>
+        <article class="drink-card" style="--i:8;"><div class="drink-name">Guava Glow</div><div class="drink-price">1350 Ft</div><div class="drink-ingredients">Guava, narancslé, grenadin, lime</div></article>
+        <article class="drink-card" style="--i:9;"><div class="drink-name">Exotic Melon</div><div class="drink-price">1200 Ft</div><div class="drink-ingredients">Sárgadinnye, lime, cukorszirup, szódavíz</div></article>
+      </div>
+    </section>
+
+    <section class="drink-category">
+      <h2>Alkoholmentes sima koktélok</h2>
+      <div class="drink-list">
+        <article class="drink-card" style="--i:10;"><div class="drink-name">Virgin Mojito</div><div class="drink-price">1100 Ft</div><div class="drink-ingredients">Lime, mentalevél, cukorszirup, szódavíz</div></article>
+        <article class="drink-card" style="--i:11;"><div class="drink-name">Virgin Margarita</div><div class="drink-price">1150 Ft</div><div class="drink-ingredients">Narancslé, lime, só</div></article>
+        <article class="drink-card" style="--i:12;"><div class="drink-name">Pina Colada (alkoholmentes)</div><div class="drink-price">1250 Ft</div><div class="drink-ingredients">Kókuszkrém, ananászlé, lime</div></article>
+        <article class="drink-card" style="--i:13;"><div class="drink-name">Lemon Spritz</div><div class="drink-price">1200 Ft</div><div class="drink-ingredients">Citromlé, cukorszirup, szódavíz</div></article>
+        <article class="drink-card" style="--i:14;"><div class="drink-name">Cucumber Cooler</div><div class="drink-price">1250 Ft</div><div class="drink-ingredients">Uborka, lime, cukorszirup, szódavíz</div></article>
+        <article class="drink-card" style="--i:15;"><div class="drink-name">Strawberry Fizz</div><div class="drink-price">1300 Ft</div><div class="drink-ingredients">Eper, lime, cukorszirup, szódavíz</div></article>
+        <article class="drink-card" style="--i:16;"><div class="drink-name">Ginger Zing</div><div class="drink-price">1200 Ft</div><div class="drink-ingredients">Gyömbér, lime, cukorszirup, szódavíz</div></article>
+        <article class="drink-card" style="--i:17;"><div class="drink-name">Apple Spritz</div><div class="drink-price">1250 Ft</div><div class="drink-ingredients">Alma, lime, cukorszirup, szódavíz</div></article>
+        <article class="drink-card" style="--i:18;"><div class="drink-name">Peach Bliss</div><div class="drink-price">1300 Ft</div><div class="drink-ingredients">Őszibarack, lime, cukorszirup, szódavíz</div></article>
+        <article class="drink-card" style="--i:19;"><div class="drink-name">Lime Refresher</div><div class="drink-price">1200 Ft</div><div class="drink-ingredients">Lime, cukorszirup, szódavíz</div></article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+   // Betöltéskor beállítjuk az előzőleg mentett témát és gomb szövegét
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      const toggleBtn = document.querySelector('.toggle-theme');
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        toggleBtn.textContent = "☀";
+      } else {
+        toggleBtn.textContent = "🌙";
+      }
+    });
+    // Téma váltás
+    const toggleBtn = document.getElementById('toggle-theme-btn');
+    toggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      toggleBtn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+    });
+
+    // Menü viselkedés (hover alapú, gyorsabb bezárás)
+    const menu = document.getElementById('menu');
+    let timeoutId;
+
+    menu.addEventListener('mouseenter', () => {
+      clearTimeout(timeoutId);
+      menu.classList.add('open');
+    });
+
+    menu.addEventListener('mouseleave', () => {
+      timeoutId = setTimeout(() => {
+        menu.classList.remove('open');
+      }, 150); // bezáródás gyorsítva 150 ms-re
+    });
+  </script>
+</body>
+</html>
